@@ -1,0 +1,30 @@
+/**
+* \namespace mantis
+*
+* @brief Main mantis namespace
+*/
+
+/**
+* \namespace mantis::go
+*
+* @brief Contains the generic interface objects. (msdr, mchannel)
+*/
+
+/**
+* \namespace mantis::interfaces
+*
+* @brief Contains the interfaces defining mantis's API. Various drivers will need to implement these.
+*/
+
+/**
+* \namespace mantis::driver_impl
+*
+* @brief Contains driver implementations/utilities
+*/
+
+/**
+* \namespace mantis::supported_devices
+*
+* @brief Contains mantis supported_devices
+*/
+

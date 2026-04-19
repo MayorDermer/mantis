@@ -1,0 +1,182 @@
+cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
+
+# declare project
+Project(mantis VERSION 0.0.2)
+
+# generate version config
+configure_file(cmake_templates/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/version.h)
+
+# CXX standard
+set(CMAKE_CXX_STANDARD 20)
+
+#####################################################################################
+##                                 Compiler Flags                                  ##
+#####################################################################################
+# add warnings as errors and all warnings
+add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Werror>
+        $<$<COMPILE_LANGUAGE:CXX>:-Wall>)
+
+# compile as hidden for linking
+add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-fvisibility=hidden>)
+
+# compile with position independent code
+add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-fPIC>)
+
+# Set build optimisation options for the native arch
+add_compile_options(
+        $<$<COMPILE_LANGUAGE:CXX>:-march=native>
+        $<$<COMPILE_LANGUAGE:CXX>:-mtune=native>)
+
+# Set the default build type to release
+if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
+    set(CMAKE_BUILD_TYPE "Release")
+    message(STATUS "Build type not specified: defaulting to release.")
+endif ()
+
+#####################################################################################
+##                                 Dependencies                                    ##
+#####################################################################################
+find_package(Threads REQUIRED)
+find_package(nlohmann_json REQUIRED)
+find_package(Boost REQUIRED COMPONENTS program_options)
+
+# supported driver list for perror messaging
+set(MANTIS_SUPPORTED_DRIVERS "UHD")
+
+# get all mantis files EXCEPT Driver specific ones
+FILE(GLOB_RECURSE SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/*.cpp)
+list(APPEND SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/config.cpp)
+
+#####################################################################################
+##                                  relevant drivers                               ##
+#####################################################################################
+# uhd
+find_package(UHD)
+if (UHD_FOUND)
+    message("Compiling with UHD support")
+    add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-D__uhd=TRUE>) # ifdef uhd flag
+    list(APPEND MANTIS_DRIVER_LIBS uhd) # update libs var
+
+    FILE(GLOB_RECURSE MANTIS_UHD_SOURCE_FILES src/driver_impl/uhd/*.cpp) # add include uhd source files
+    list(APPEND SOURCE_FILES ${MANTIS_UHD_SOURCE_FILES})
+
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/driver_impl/uhd DESTINATION include/mantis/driver_impl/) # install mantis uhd impl includes
+else ()
+    message("Compiling without UHD support")
+endif ()
+
+# add the "virtual" driver
+FILE(GLOB_RECURSE MANTIS_VIRTUAL_SOURCE_FILES src/driver_impl/virtual/*.cpp) # add include virtual source files
+list(APPEND SOURCE_FILES ${MANTIS_VIRTUAL_SOURCE_FILES})
+
+# install virtual msdr includes
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/driver_impl/virtual DESTINATION include/mantis/driver_impl/) # install mantis virtual impl includes
+
+
+# make sure we found at least one driver library
+if (MANTIS_DRIVER_LIBS STREQUAL "")
+    message(FATAL_ERROR "[FATAL ERROR] No supported drivers found. Supported drivers are: ${MANTIS_SUPPORTED_DRIVERS}")
+endif ()
+
+#####################################################################################
+##                                   main library                                  ##
+#####################################################################################
+add_library(mantis SHARED ${SOURCE_FILES}) # link threads here?
+target_link_libraries(mantis PUBLIC Threads::Threads nlohmann_json::nlohmann_json Boost::program_options ${MANTIS_DRIVER_LIBS})
+
+# include dirs
+target_include_directories(mantis PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+)
+
+set_target_properties(mantis PROPERTIES VERSION ${PROJECT_VERSION})
+
+#####################################################################################
+##                               library installation                              ##
+#####################################################################################
+
+# additional mantis files
+file(GLOB OTHER_MANTIS_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/*.h ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/*.hpp)
+
+#install include dir
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/lib DESTINATION include/mantis/)
+
+
+install(FILES ${OTHER_MANTIS_INCLUDES} DESTINATION include/mantis/)
+
+
+install(TARGETS mantis
+        EXPORT MantisTargets
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION lib
+        INCLUDES DESTINATION include
+)
+
+install(EXPORT MantisTargets
+        FILE MantisTargets.cmake
+        NAMESPACE mantis::
+        DESTINATION lib/cmake/mantis
+)
+
+#####################################################################################
+##                                   executables                                   ##
+#####################################################################################
+
+# dev-executable
+if (DEV)
+    add_executable(mantis-exec ${PROJECT_SOURCE_DIR}/main.cpp)
+    target_link_libraries(mantis-exec PRIVATE mantis)
+endif ()
+
+# mantis example utils
+FILE(GLOB_RECURSE MANTIS_BINARIES_ADDITIONAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/examples/utilities/*.cpp)
+
+# init-devices
+add_executable(mantis_find_devices ${CMAKE_CURRENT_SOURCE_DIR}/examples/mantis_find_devices.cpp ${MANTIS_BINARIES_ADDITIONAL_SOURCES})
+target_link_libraries(mantis_find_devices PRIVATE mantis)
+list(APPEND MANTIS_BINARY_TARGETS mantis_find_devices)
+
+# tx-from-file
+add_executable(mantis_tx_from_file ${CMAKE_CURRENT_SOURCE_DIR}/examples/mantis_tx_from_file.cpp ${MANTIS_BINARIES_ADDITIONAL_SOURCES})
+target_link_libraries(mantis_tx_from_file PRIVATE mantis)
+list(APPEND MANTIS_BINARY_TARGETS mantis_tx_from_file)
+
+# rx-to-file
+add_executable(mantis_rx_to_file ${CMAKE_CURRENT_SOURCE_DIR}/examples/mantis_rx_to_file.cpp ${MANTIS_BINARIES_ADDITIONAL_SOURCES})
+target_link_libraries(mantis_rx_to_file PRIVATE mantis)
+list(APPEND MANTIS_BINARY_TARGETS mantis_rx_to_file)
+
+# cw_tx
+add_executable(mantis_cw_tx ${CMAKE_CURRENT_SOURCE_DIR}/examples/mantis_cw_tx.cpp ${MANTIS_BINARIES_ADDITIONAL_SOURCES})
+target_link_libraries(mantis_cw_tx PRIVATE mantis)
+list(APPEND MANTIS_BINARY_TARGETS mantis_cw_tx)
+
+install(TARGETS ${MANTIS_BINARY_TARGETS} DESTINATION bin)
+
+#####################################################################################
+##                MantisConfig.cmake and MantisConfigVersion.cmake                 ##
+#####################################################################################
+
+# mantis config
+include(CMakePackageConfigHelpers)
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/MantisConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/MantisConfig.cmake
+        INSTALL_DESTINATION lib/cmake/mantis)
+
+# version config
+write_basic_package_version_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/MantisConfigVersion.cmake
+        VERSION ${PROJECT_VERSION} COMPATIBILITY SameMinorVersion)
+
+
+#####################################################################################
+##                               .cmake installations                              ##
+#####################################################################################
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/MantisConfig.cmake DESTINATION lib/cmake/mantis)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/MantisConfigVersion.cmake DESTINATION lib/cmake/mantis)
+
+# install config json
+install(FILES ${PROJECT_SOURCE_DIR}/mantis-config.json DESTINATION share/mantis/)
+
+install(CODE "message(\"Mantis v${PROJECT_VERSION} successfully installed.\nPlease run 'sudo ldconfig' to update the library cache.\")")

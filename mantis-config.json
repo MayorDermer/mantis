@@ -1,0 +1,35 @@
+{
+  "ALLOW_VIRTUAL": true,
+  "FORCE_VIRTUAL": false,
+  "USE_CONFIG_MSDRS" : false,
+  "DEFAULT_VIRTUAL_TX_MODE": "SOCKET",
+  "DEFAULT_VIRTUAL_RX_MODE": "SOCKET",
+  "DEFAULT_VIRTUAL_HOST": "0.0.0.0",
+  "BASE_FILENAME": "test_output",
+  "DEFAULT_VIRTUAL_PORT": 7777,
+  "FILE_EXTENSION": ".32fc",
+  "MONITOR_THREAD_SLEEP_TIME": 300,
+  "RECONNECTION_THREAD_SLEEP_TIME": 20,
+  "CPU_SAMPLE_FORMAT": "fc32",
+  "OTW_SDR_FORMAT": "sc16",
+  "SOCKET_TYPE": 1,
+  "VIRTUAL_MSDRS": [
+    {
+      "NAME": "L",
+      "TYPE": "JAMES",
+      "TX_CHANNELS": [
+        {
+          "FILENAME": "hummmmmmm",
+          "MODE": "FILE"
+        }
+      ],
+      "RX_CHANNELS": [
+        {
+          "MODE": "SOCKET",
+          "HOST": "0.0.0.0",
+          "PORT": 7676
+        }
+      ]
+    }
+  ]
+}
