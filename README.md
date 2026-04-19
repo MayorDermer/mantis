@@ -2,6 +2,9 @@
 
 SDR Driver Abstraction Library
 
+## Library Install Instructions:
+- curl -fsSL https://raw.githubusercontent.com/MayorDermer/mantis/refs/heads/main/install.sh | bash
+
 ## Steps for adding support for another driver
 
 1. Add support in the project's cmake

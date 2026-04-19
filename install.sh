@@ -13,6 +13,11 @@ else
     SUDO="sudo"
 fi
 
+echo "installing basic dependencies..."
+$SUDO apt-get update && $SUDO apt-get install -y \
+    build-essential \
+    cmake
+
 #nlohmann_json
 pdep "nlohmann_json"
 

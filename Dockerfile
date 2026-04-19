@@ -7,8 +7,6 @@ WORKDIR /work
 # Install basic tools
 RUN apt-get update && apt-get install -y \
     git \
-    build-essential \
-    cmake \
     ca-certificates 
 
 ADD ./install.sh "install.sh"
