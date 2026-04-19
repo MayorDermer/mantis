@@ -1,0 +1,53 @@
+name: Build (default)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ '*' ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake libboost-program-options-dev
+          git clone https://github.com/nlohmann/json.git
+          cd json
+          cmake -S . -B build
+          cmake --build build --parallel $(nproc)
+          sudo cmake --install build
+
+      - name: CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build
+  build-uhd:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake
+          sudo apt-get install -y libuhd-dev
+          sudo apt-get install -y libboost-program-options-dev
+          git clone https://github.com/nlohmann/json.git
+          cd json
+          cmake -S . -B build
+          cmake --build build --parallel $(nproc)
+          sudo cmake --install build
+
+      - name: CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build
