@@ -10,8 +10,10 @@ static constexpr size_t INDICATOR_SLEEP_TIME = 5;
 
 #define PASSES_THRESHOLD(a, b) (std::abs(a - b) < threshold)
 
+static std::string program_description = "Transmit CW at specified parameters.";
+
 int main(int argc, char **argv) {
-    po::options_description desc("Options");
+    po::options_description desc(program_description + "\nOptions");
     desc.add_options()
             ("help,h", "produce help message")
             ("args", po::value<std::string>(), "device args str")
@@ -33,6 +35,7 @@ int main(int argc, char **argv) {
 
     po::notify(vm);
 
+    mantis::utils::pversion();
 
     auto &d_manager = mantis::device_manager::get_instance();
 

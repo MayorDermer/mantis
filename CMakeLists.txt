@@ -40,6 +40,14 @@ find_package(Threads REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(Boost REQUIRED COMPONENTS program_options)
 
+if(NOT NO_PYTHON)
+        find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+        find_package(pybind11 REQUIRED)
+        message(STATUS "pybind11 found, enabling PyMantis")
+        set(PyMantisEnabled TRUE)
+else()
+    message(STATUS "NO_PYTHON optinon detected, skipping PyMantis setup")
+endif()
 # supported driver list for perror messaging
 set(MANTIS_SUPPORTED_DRIVERS "UHD")
 
@@ -93,32 +101,51 @@ target_include_directories(mantis PUBLIC
 set_target_properties(mantis PROPERTIES VERSION ${PROJECT_VERSION})
 
 #####################################################################################
+##                                   PyMantis                                      ##
+#####################################################################################
+
+if(PyMantisEnabled)
+        pybind11_add_module(mantis_python pybind/pymantis.cpp)
+        target_link_libraries(mantis_python PRIVATE mantis)
+        set_target_properties(mantis_python PROPERTIES OUTPUT_NAME mantis)
+endif()
+
+#####################################################################################
 ##                               library installation                              ##
 #####################################################################################
 
 # additional mantis files
 file(GLOB OTHER_MANTIS_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/*.h ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/*.hpp)
 
+include(GNUInstallDirs)
+
 #install include dir
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/lib DESTINATION include/mantis/)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/lib DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mantis)
 
-
-install(FILES ${OTHER_MANTIS_INCLUDES} DESTINATION include/mantis/)
-
+install(FILES ${OTHER_MANTIS_INCLUDES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mantis)
 
 install(TARGETS mantis
         EXPORT MantisTargets
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        RUNTIME DESTINATION lib
-        INCLUDES DESTINATION include
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 install(EXPORT MantisTargets
         FILE MantisTargets.cmake
         NAMESPACE mantis::
-        DESTINATION lib/cmake/mantis
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/mantis
 )
+
+if(PyMantisEnabled)
+install(
+    TARGETS mantis_python
+    LIBRARY DESTINATION "/usr/lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/"
+    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+)
+endif()
 
 #####################################################################################
 ##                                   executables                                   ##

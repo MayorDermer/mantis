@@ -21,7 +21,8 @@ RUN cmake -S json -B json/build \
     && cmake --build json/build -j 10\
     && cmake --install json/build
 
-COPY . ./mantis
+ADD mantis "mantis"
+ADD mantis "mantis"
 RUN if [ -d "mantis/build" ]; then rm -rf mantis/build; fi
 RUN cmake -S mantis -B mantis/build \
     && cmake --build mantis/build -j 10 \
