@@ -7,12 +7,22 @@ WORKDIR /work
 # Install basic tools
 RUN apt-get update && apt-get install -y \
     git \
-    ca-certificates 
+    build-essential \
+    cmake \
+    ca-certificates \
+    nlohmann-json3-dev \
+    python3-pybind11 pybind11-dev \
+    libboost-program-options-dev && rm -rf /var/lib/apt/lists/* 
 
-ADD ./install.sh "install.sh"
+ADD . "mantis"
 
-RUN bash ./install.sh && rm ./install.sh &&rm -rf /var/lib/apt/lists/* 
+RUN if [ -d "mantis/build" ]; then rm -rf mantis/build; fi
+
+RUN cd mantis && mkdir -p build \
+&& cd build && cmake .. && make install \
+&& cd ../.. && rm -rf mantis
 
 RUN ldconfig
+
 # Default shell when container starts
-CMD ["/bin/bash"]
+ENTRYPOINT ["/bin/bash"]
