@@ -151,12 +151,6 @@ endif()
 ##                                   executables                                   ##
 #####################################################################################
 
-# dev-executable
-if (DEV)
-    add_executable(mantis-exec ${PROJECT_SOURCE_DIR}/main.cpp)
-    target_link_libraries(mantis-exec PRIVATE mantis)
-endif ()
-
 # mantis example utils
 FILE(GLOB_RECURSE MANTIS_BINARIES_ADDITIONAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/examples/utilities/*.cpp)
 

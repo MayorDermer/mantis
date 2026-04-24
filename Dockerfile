@@ -4,7 +4,7 @@ FROM ubuntu:latest
 # Set a working directory
 WORKDIR /work
 
-# Install basic tools
+# Install basic tools and dependencies
 RUN apt-get update && apt-get install -y \
     git \
     build-essential \
