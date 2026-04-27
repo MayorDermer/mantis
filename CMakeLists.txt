@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
 # declare project
-Project(mantis VERSION 0.0.2)
+Project(mantis VERSION 0.0.3)
 
 # generate version config
 configure_file(cmake_templates/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/version.h)
