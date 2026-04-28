@@ -40,14 +40,6 @@ find_package(Threads REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(Boost REQUIRED COMPONENTS program_options)
 
-if(NOT NO_PYTHON)
-        find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
-        find_package(pybind11 REQUIRED)
-        message(STATUS "pybind11 found, enabling PyMantis")
-        set(PyMantisEnabled TRUE)
-else()
-    message(STATUS "NO_PYTHON optinon detected, skipping PyMantis setup")
-endif()
 # supported driver list for perror messaging
 set(MANTIS_SUPPORTED_DRIVERS "UHD")
 
@@ -101,16 +93,6 @@ target_include_directories(mantis PUBLIC
 set_target_properties(mantis PROPERTIES VERSION ${PROJECT_VERSION})
 
 #####################################################################################
-##                                   PyMantis                                      ##
-#####################################################################################
-
-if(PyMantisEnabled)
-        pybind11_add_module(mantis_python pybind/pymantis.cpp)
-        target_link_libraries(mantis_python PRIVATE mantis)
-        set_target_properties(mantis_python PROPERTIES OUTPUT_NAME mantis)
-endif()
-
-#####################################################################################
 ##                               library installation                              ##
 #####################################################################################
 
@@ -137,15 +119,6 @@ install(EXPORT MantisTargets
         NAMESPACE mantis::
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/mantis
 )
-
-if(PyMantisEnabled)
-install(
-    TARGETS mantis_python
-    LIBRARY DESTINATION "/usr/lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/"
-    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
-)
-endif()
 
 #####################################################################################
 ##                                   executables                                   ##

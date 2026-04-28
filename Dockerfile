@@ -11,7 +11,6 @@ RUN apt-get update && apt-get install -y \
     cmake \
     ca-certificates \
     nlohmann-json3-dev \
-    python3-pybind11 pybind11-dev \
     libboost-program-options-dev && rm -rf /var/lib/apt/lists/* 
 
 ADD . "mantis"
