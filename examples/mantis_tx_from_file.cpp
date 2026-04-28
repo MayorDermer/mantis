@@ -11,10 +11,12 @@ namespace po = boost::program_options;
 static constexpr double TX_BUFF_SIZE = 1e5;
 static constexpr double threshold = 1e-6;
 
+static std::string program_description = "Transmit samples from file at specified TX params.";
+
 #define PASSES_THRESHOLD(a, b) (std::abs(a - b) < threshold)
 
 int main(int argc, char **argv) {
-    po::options_description desc("Options");
+    po::options_description desc(program_description + "\nOptions");
     desc.add_options()
             ("help,h", "produce help message")
             ("filename", po::value<std::string>()->required(), "REQUIRED. Full path of the file to transmit from")
@@ -39,6 +41,8 @@ int main(int argc, char **argv) {
 
     po::notify(vm);
 
+    mantis::utils::pversion();
+    
     /// first, try to open file
     std::ifstream file(vm["filename"].as<std::string>(), std::ios::out | std::ios::binary);
     if (!file.is_open()) {

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
 # declare project
-Project(mantis VERSION 0.0.2)
+Project(mantis VERSION 0.0.3)
 
 # generate version config
 configure_file(cmake_templates/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/version.h)
@@ -99,59 +99,36 @@ set_target_properties(mantis PROPERTIES VERSION ${PROJECT_VERSION})
 # additional mantis files
 file(GLOB OTHER_MANTIS_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/*.h ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/*.hpp)
 
+include(GNUInstallDirs)
+
 #install include dir
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/lib DESTINATION include/mantis/)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/lib DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mantis)
 
-
-install(FILES ${OTHER_MANTIS_INCLUDES} DESTINATION include/mantis/)
-
+install(FILES ${OTHER_MANTIS_INCLUDES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mantis)
 
 install(TARGETS mantis
         EXPORT MantisTargets
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        RUNTIME DESTINATION lib
-        INCLUDES DESTINATION include
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 install(EXPORT MantisTargets
         FILE MantisTargets.cmake
         NAMESPACE mantis::
-        DESTINATION lib/cmake/mantis
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/mantis
 )
 
 #####################################################################################
 ##                                   executables                                   ##
 #####################################################################################
 
-# dev-executable
-if (DEV)
-    add_executable(mantis-exec ${PROJECT_SOURCE_DIR}/main.cpp)
-    target_link_libraries(mantis-exec PRIVATE mantis)
-endif ()
-
-# mantis example utils
-FILE(GLOB_RECURSE MANTIS_BINARIES_ADDITIONAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/examples/utilities/*.cpp)
-
-# init-devices
-add_executable(mantis_find_devices ${CMAKE_CURRENT_SOURCE_DIR}/examples/mantis_find_devices.cpp ${MANTIS_BINARIES_ADDITIONAL_SOURCES})
-target_link_libraries(mantis_find_devices PRIVATE mantis)
-list(APPEND MANTIS_BINARY_TARGETS mantis_find_devices)
-
-# tx-from-file
-add_executable(mantis_tx_from_file ${CMAKE_CURRENT_SOURCE_DIR}/examples/mantis_tx_from_file.cpp ${MANTIS_BINARIES_ADDITIONAL_SOURCES})
-target_link_libraries(mantis_tx_from_file PRIVATE mantis)
-list(APPEND MANTIS_BINARY_TARGETS mantis_tx_from_file)
-
-# rx-to-file
-add_executable(mantis_rx_to_file ${CMAKE_CURRENT_SOURCE_DIR}/examples/mantis_rx_to_file.cpp ${MANTIS_BINARIES_ADDITIONAL_SOURCES})
-target_link_libraries(mantis_rx_to_file PRIVATE mantis)
-list(APPEND MANTIS_BINARY_TARGETS mantis_rx_to_file)
-
-# cw_tx
-add_executable(mantis_cw_tx ${CMAKE_CURRENT_SOURCE_DIR}/examples/mantis_cw_tx.cpp ${MANTIS_BINARIES_ADDITIONAL_SOURCES})
-target_link_libraries(mantis_cw_tx PRIVATE mantis)
-list(APPEND MANTIS_BINARY_TARGETS mantis_cw_tx)
+# mantis
+add_executable(mantis_bin ${CMAKE_CURRENT_SOURCE_DIR}/src/mantis.cpp ${MANTIS_BINARIES_ADDITIONAL_SOURCES})
+target_link_libraries(mantis_bin PRIVATE mantis)
+set_target_properties(mantis_bin PROPERTIES OUTPUT_NAME mantis)
+list(APPEND MANTIS_BINARY_TARGETS mantis_bin)
 
 install(TARGETS ${MANTIS_BINARY_TARGETS} DESTINATION bin)
 

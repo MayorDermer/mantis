@@ -12,10 +12,12 @@ static constexpr double RX_BUFF_SIZE = 1e5;
 static constexpr double threshold = 1e-6;
 static constexpr size_t INDICATOR_SLEEP_TIME = 3;
 
+static std::string program_description = "Receive samples at specified RX params and write to file.";
+
 #define PASSES_THRESHOLD(a, b) (std::abs(a - b) < threshold)
 
 int main(int argc, char **argv) {
-    po::options_description desc("Options");
+    po::options_description desc(program_description + "\nOptions");
     desc.add_options()
             ("help,h", "produce help message")
             ("filename", po::value<std::string>()->required(),
@@ -40,6 +42,8 @@ int main(int argc, char **argv) {
     po::notify(vm);
 
 
+    mantis::utils::pversion();
+    
     /// first, try to open file
     std::ofstream file(vm["filename"].as<std::string>(), std::ios::out | std::ios::binary);
     if (!file.is_open()) {
