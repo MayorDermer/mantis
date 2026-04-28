@@ -4,7 +4,10 @@ SDR Driver Abstraction Library
 
 ## Library Install Instructions:
 ### Ubuntu
-run the terminal command `curl -fsSL https://raw.githubusercontent.com/MayorDermer/mantis/refs/heads/main/install.sh | bash`
+run the terminal command 
+```bash 
+curl -fsSL https://raw.githubusercontent.com/MayorDermer/mantis/refs/heads/main/install.sh | bash
+```
 
 ## Steps for adding support for another driver
 

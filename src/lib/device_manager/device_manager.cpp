@@ -291,8 +291,8 @@ std::vector<mantis::params::msdr_params> mantis::device_manager::find(params::ms
 
 void mantis::device_manager::configure() {
     const char *config_file = std::getenv("MANTIS_CONFIG_FILE");
-    std::ifstream mantis_config_json(
-            config_file ? config_file : "/usr/local/share/mantis/mantis-config.json");
+    config_file = (config_file == nullptr) ? MANTIS_DEFAULT_CONFIG_FILE_PATH : config_file;
+    std::ifstream mantis_config_json(config_file);
     if (!mantis_config_json.is_open()) {
         throw std::runtime_error(std::string("Unable to open Json") + config_file);
     }
