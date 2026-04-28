@@ -32,6 +32,7 @@ int main(int argc, char** argv) {
     bool find;
     bool tx_from_file;
     bool rx_to_file;
+    bool cw;
     bool version;
     bool repeat;
 
@@ -45,6 +46,7 @@ int main(int argc, char** argv) {
     opts("version,v", po::bool_switch(&version)->default_value(false), "print mantis version");
     opts("tx_from_file,t", po::bool_switch(&tx_from_file)->default_value(false), "transmit from file");
     opts("rx_to_file,r", po::bool_switch(&rx_to_file)->default_value(false), "receive to file");
+    opts("cw,w", po::bool_switch(&cw)->default_value(false), "transmit a continuous wave");
 
     // args
     opts("args,a", po::value<std::string>(&args)->default_value(""), "device args str. Leave empty to find all");
@@ -107,8 +109,8 @@ int main(int argc, char** argv) {
         return EXIT_SUCCESS;
     }
 
-    if (tx_from_file && rx_to_file) {
-        mantis::utils::perror("Cannot use --tx_from_file/-t and --rx_to_file/-r at the same time");
+    if (tx_from_file + rx_to_file + cw > 1) {
+        mantis::utils::perror("Cannot use --tx_from_file/-t, --rx_to_file/-r, or --cw/-w at the same time");
         return EXIT_FAILURE;
     }
 
@@ -139,15 +141,8 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
-    /// tx from file
-    if (tx_from_file) {
-
-        /// try to open file
-        std::ifstream file(filename, std::ios::in | std::ios::binary);
-        if (!file.is_open()) {
-            mantis::utils::perror("Failed to open file: " + filename);
-            return EXIT_FAILURE;
-        }
+    /// tx from file/ cw
+    if (tx_from_file || cw) {
 
         /// acquire channel
         auto [err, tx_channel] = d_manager.get_tx_channel(params, channel_num);
@@ -177,12 +172,49 @@ int main(int argc, char** argv) {
         /// metadata
         mantis::go::mtx_metadata tx_md{.start_of_burst = true, .end_of_burst = false};
 
-        mantis::utils::pinfo("Beginning TX");
+        if (cw) {
+
+            // fill our buffer accordingly
+            if (sample_size == 8) {
+                auto data_ptr = reinterpret_cast<std::complex<float>*>(buff);
+                static std::complex<float> sample = {1, 0};
+                for (int i = 0; i < BUFF_SIZE / sample_size; i++) {
+                    data_ptr[i] = sample;
+                }
+            } else {
+                auto* data_ptr = reinterpret_cast<std::complex<double>*>(buff);
+                static std::complex<double> sample = {1, 0};
+                for (int i = 0; i < BUFF_SIZE / sample_size; i++) {
+                    // gotta love strong typing
+                    data_ptr[i] = sample;
+                }
+            }
+            mantis::utils::pinfo("Starting CW Tx, will continue until stopped");
+            while (true) {
+                if (!tx_channel->is_valid()) [[unlikely]] {
+                    mantis::utils::perror("SDR healthcheck Failed, channel invalid");
+                    free(buff);
+                    return EXIT_FAILURE;
+                }
+                tx_channel->send(buff, sample_size, BUFF_SIZE / sample_size, tx_md);
+            }
+        }
+
+        /// try open file
+        std::ifstream file(filename, std::ios::in | std::ios::binary);
+        if (!file.is_open()) {
+            mantis::utils::perror("Failed to open file: " + filename);
+            return EXIT_FAILURE;
+        }
+
+        mantis::utils::pinfo("Starting Tx from File: " + filename);
+
         while (repeat || reps--) {
             while (file.read(buff, BUFF_SIZE) || file.gcount() > 0) {
                 if (!tx_channel->is_valid()) [[unlikely]] {
                     mantis::utils::perror("SDR healthcheck Failed, channel invalid");
-                    throw mantis::runtime_error("Invalid Channel");
+                    free(buff);
+                    return EXIT_FAILURE;
                 }
                 tx_channel->send(buff, sample_size, BUFF_SIZE / sample_size, tx_md);
             }
@@ -193,6 +225,7 @@ int main(int argc, char** argv) {
         free(buff);
 
         mantis::utils::pinfo("Done");
+        return EXIT_SUCCESS;
     }
 
     /// rx from file
@@ -233,19 +266,18 @@ int main(int argc, char** argv) {
         /// metadata
         mantis::go::mrx_metadata rx_md{.start_of_burst = true};
 
-        mantis::utils::pinfo("Beginning Rx, will run until stopped");
+        mantis::utils::pinfo("Starting Rx to File: " + filename + ", will run until stopped");
 
         while (true) {
             if (!rx_channel->is_valid()) [[unlikely]] {
-                mantis::utils::perror("SDR healthcheck Failed, channel invalid. Shutting Down...");
+                mantis::utils::perror("SDR healthcheck Failed, channel invalid");
+                free(buff);
                 return EXIT_FAILURE;
             }
 
             rx_channel->receive(buff, sample_size, BUFF_SIZE / sample_size, rx_md);
             file.write(buff, BUFF_SIZE);
         }
-
-        free(buff); // yes this does absolutely nothing but doesnt feel right without it
     }
 
     return EXIT_SUCCESS;

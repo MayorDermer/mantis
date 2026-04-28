@@ -151,34 +151,11 @@ endif()
 ##                                   executables                                   ##
 #####################################################################################
 
-# mantis example utils
-FILE(GLOB_RECURSE MANTIS_BINARIES_ADDITIONAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/examples/utilities/*.cpp)
-
 # mantis
 add_executable(mantis_bin ${CMAKE_CURRENT_SOURCE_DIR}/src/mantis.cpp ${MANTIS_BINARIES_ADDITIONAL_SOURCES})
 target_link_libraries(mantis_bin PRIVATE mantis)
 set_target_properties(mantis_bin PROPERTIES OUTPUT_NAME mantis)
 list(APPEND MANTIS_BINARY_TARGETS mantis_bin)
-
-# find-devices
-add_executable(mantis_find_devices ${CMAKE_CURRENT_SOURCE_DIR}/examples/mantis_find_devices.cpp ${MANTIS_BINARIES_ADDITIONAL_SOURCES})
-target_link_libraries(mantis_find_devices PRIVATE mantis)
-list(APPEND MANTIS_BINARY_TARGETS mantis_find_devices)
-
-# tx-from-file
-add_executable(mantis_tx_from_file ${CMAKE_CURRENT_SOURCE_DIR}/examples/mantis_tx_from_file.cpp ${MANTIS_BINARIES_ADDITIONAL_SOURCES})
-target_link_libraries(mantis_tx_from_file PRIVATE mantis)
-list(APPEND MANTIS_BINARY_TARGETS mantis_tx_from_file)
-
-# rx-to-file
-add_executable(mantis_rx_to_file ${CMAKE_CURRENT_SOURCE_DIR}/examples/mantis_rx_to_file.cpp ${MANTIS_BINARIES_ADDITIONAL_SOURCES})
-target_link_libraries(mantis_rx_to_file PRIVATE mantis)
-list(APPEND MANTIS_BINARY_TARGETS mantis_rx_to_file)
-
-# cw_tx
-add_executable(mantis_cw_tx ${CMAKE_CURRENT_SOURCE_DIR}/examples/mantis_cw_tx.cpp ${MANTIS_BINARIES_ADDITIONAL_SOURCES})
-target_link_libraries(mantis_cw_tx PRIVATE mantis)
-list(APPEND MANTIS_BINARY_TARGETS mantis_cw_tx)
 
 install(TARGETS ${MANTIS_BINARY_TARGETS} DESTINATION bin)
 
