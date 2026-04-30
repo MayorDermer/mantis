@@ -141,6 +141,12 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
+    // init sdr TODO: get rid of the init and init in get_x_channel?
+    if (!mantis::errors::succeeded(d_manager.init(1, params))) {
+        mantis::utils::perror("Could not init relevant SDR");
+        return EXIT_FAILURE;
+    }
+
     /// tx from file/ cw
     if (tx_from_file || cw) {
 

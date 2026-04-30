@@ -183,6 +183,7 @@ mantis::device_manager::get_tx_channel(const params::msdr_params &msdr_params,
     errors::error_code relevant_error = (this->connected_sdrs.empty()) ? errors::error_code::NO_SDRS_CONNECTED
                                                                        : errors::error_code::NO_MATCHING_SDR;
 
+    //TODO: add scan for matching devices and init them, do the same for rx
     for (const auto &msdr: this->connected_sdrs) {
         if (!params::msdr_params::compare(msdr_params, msdr->get_params())) {
             continue;
