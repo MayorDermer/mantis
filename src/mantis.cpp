@@ -148,6 +148,7 @@ int main(int argc, char** argv) {
         auto [err, tx_channel] = d_manager.get_tx_channel(params, channel_num);
         if (!mantis::errors::succeeded(err)) {
             mantis::utils::perror("Failed to Acquire Channel: " + mantis::errors::mantis_errno(err));
+            return EXIT_FAILURE;
         }
 
         /// configure channel
