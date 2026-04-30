@@ -31,7 +31,7 @@ pdep "boost program options"
 $SUDO apt-get install -y libboost-program-options-dev
 
 echo "Installing mantis..."
-git clone https://github.com/MayorDermer/mantis.git
+git clone https://github.com/dermayor/mantis.git
 cd mantis && mkdir -p build \
 && cd build && cmake .. && $SUDO make -j $(nproc) install \
 && cd ../.. && rm -rf mantis
