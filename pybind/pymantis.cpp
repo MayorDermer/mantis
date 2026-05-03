@@ -13,7 +13,8 @@ namespace py = pybind11;
 
 
 PYBIND11_MODULE(mantis, m) {
-    /// time_tag
+    m.attr("__version__") = MANTIS_VERSION;
+    
     bind_time_tag(m);
     bind_errors(m);
     bind_msdr_params(m);

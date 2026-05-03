@@ -4,3 +4,4 @@ build/
 .vscode/
 include/mantis/version.h
 include/mantis/build_info.h
+.venv/

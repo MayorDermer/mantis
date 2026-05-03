@@ -42,11 +42,12 @@ find_package(Boost REQUIRED COMPONENTS program_options)
 
 if(NOT NO_PYTHON)
         find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
-        find_package(pybind11 REQUIRED)
+        set(PYBIND11_FINDPYTHON ON)
+        find_package(pybind11 CONFIG REQUIRED)
         message(STATUS "pybind11 found, enabling PyMantis")
         set(PyMantisEnabled TRUE)
 else()
-    message(STATUS "NO_PYTHON optinon detected, skipping PyMantis setup")
+    message(STATUS "NO_PYTHON option detected, skipping PyMantis setup")
 endif()
 
 # supported driver list for perror messaging
@@ -118,6 +119,12 @@ if(PyMantisEnabled)
         pybind11_add_module(mantis_python pybind/pymantis.cpp)
         target_link_libraries(mantis_python PRIVATE mantis)
         set_target_properties(mantis_python PROPERTIES OUTPUT_NAME mantis)
+    if(DEFINED SKBUILD)
+        set_target_properties(mantis_python PROPERTIES INSTALL_RPATH "$ORIGIN")
+        install(TARGETS mantis mantis_python DESTINATION .)
+    else()
+        install(TARGETS mantis_python DESTINATION "${Python3_SITEARCH}")
+    endif()
 endif()
 
 #####################################################################################
@@ -147,15 +154,6 @@ install(EXPORT MantisTargets
         NAMESPACE mantis::
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/mantis
 )
-
-if(PyMantisEnabled)
-install(
-    TARGETS mantis_python
-    LIBRARY DESTINATION "/usr/lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/"
-    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
-)
-endif()
 
 #####################################################################################
 ##                                   executables                                   ##

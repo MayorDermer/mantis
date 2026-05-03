@@ -317,9 +317,6 @@ void mantis::device_manager::configure() {
 
 namespace mantis {
     std::ostream &operator<<(std::ostream &stream, const mantis::device_manager &d_manager) {
-        mantis::utils::pinfo(
-                "Connected devices: ");
-
         if (d_manager.connected_sdrs.empty()) {
             stream << "No devices connected\n";
             return stream;
