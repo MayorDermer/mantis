@@ -19,7 +19,7 @@ ADD . "mantis"
 RUN if [ -d "mantis/build" ]; then rm -rf mantis/build; fi
 
 RUN cd mantis && mkdir -p build \
-&& cd build && cmake .. && make install \
+&& cd build && cmake .. && make -j $(nproc) install \
 && cd ../.. && rm -rf mantis
 
 RUN ldconfig

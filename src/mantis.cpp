@@ -83,7 +83,7 @@ int main(int argc, char** argv) {
     }
 
     if (drivers_list) {
-        std::cout << "Active Drivers: " << MANTIS_ACTIVE_DRIVERS << std::endl;
+        std::cout << (std::string(MANTIS_ACTIVE_DRIVERS).empty() ? "Virtual Only" : MANTIS_ACTIVE_DRIVERS) << std::endl;
         return EXIT_SUCCESS;
     }
 

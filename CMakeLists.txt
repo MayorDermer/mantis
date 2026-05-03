@@ -75,7 +75,7 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/driver_impl/virtual
 
 # make sure we found at least one driver library
 if ("${MANTIS_DRIVER_LIBS}" STREQUAL "")
-    message(WARNING "[Warning] No supported drivers found.\nSupported drivers are: ${MANTIS_SUPPORTED_DRIVERS}\n compiling with virtual functionality only")
+    message(WARNING "[Warning] No supported drivers found.\nSupported drivers are: ${MANTIS_SUPPORTED_DRIVERS}\nCompiling with virtual functionality only")
 endif ()
 
 # generate build_info file
