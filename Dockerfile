@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
     ca-certificates \
+    libuhd-dev \
     nlohmann-json3-dev \
     libboost-program-options-dev && rm -rf /var/lib/apt/lists/* 
 

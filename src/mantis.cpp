@@ -35,6 +35,7 @@ int main(int argc, char** argv) {
     bool cw;
     bool version;
     bool repeat;
+    bool drivers_list;
 
     po::options_description desc(program_description + "\nOptions");
     auto opts = desc.add_options();
@@ -47,7 +48,8 @@ int main(int argc, char** argv) {
     opts("tx_from_file,t", po::bool_switch(&tx_from_file)->default_value(false), "transmit from file");
     opts("rx_to_file,r", po::bool_switch(&rx_to_file)->default_value(false), "receive to file");
     opts("cw,w", po::bool_switch(&cw)->default_value(false), "transmit a continuous wave");
-
+    opts("drivers_list,d", po::bool_switch(&drivers_list)->default_value(false), "list available drivers with current build");
+    
     // args
     opts("args,a", po::value<std::string>(&args)->default_value(""), "device args str. Leave empty to find all");
     opts("filename,F", po::value<std::string>(&filename)->default_value(""),
@@ -77,6 +79,11 @@ int main(int argc, char** argv) {
 
     if (version) {
         std::cout << MANTIS_VERSION << std::endl;
+        return EXIT_SUCCESS;
+    }
+
+    if (drivers_list) {
+        std::cout << "Active Drivers: " << MANTIS_ACTIVE_DRIVERS << std::endl;
         return EXIT_SUCCESS;
     }
 
