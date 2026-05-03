@@ -12,5 +12,6 @@
 #include <mantis/lib/classes/mchannel/mtx_channel.h>
 #include <mantis/config.h>
 #include <mantis/version.h>
+#include <mantis/build_info.h>
 
 #endif //MANTIS_MANTIS_H

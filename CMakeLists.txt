@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 # declare project
 Project(mantis VERSION 0.0.3)
 
-# generate version config
+# generate version config an supported drivers list
 configure_file(cmake_templates/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/version.h)
 
 # CXX standard
@@ -59,6 +59,7 @@ list(APPEND SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/config.cpp)
 #####################################################################################
 ##                                  relevant drivers                               ##
 #####################################################################################
+
 # uhd
 find_package(UHD)
 if (UHD_FOUND)
@@ -83,14 +84,21 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/driver_impl/virtual
 
 
 # make sure we found at least one driver library
-if (MANTIS_DRIVER_LIBS STREQUAL "")
-    message(FATAL_ERROR "[FATAL ERROR] No supported drivers found. Supported drivers are: ${MANTIS_SUPPORTED_DRIVERS}")
+if ("${MANTIS_DRIVER_LIBS}" STREQUAL "")
+    message(WARNING "[Warning] No supported drivers found.\nSupported drivers are: ${MANTIS_SUPPORTED_DRIVERS}\nCompiling with virtual functionality only")
 endif ()
+
+# generate build_info file
+configure_file(cmake_templates/build_info.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/build_info.h)
 
 #####################################################################################
 ##                                   main library                                  ##
 #####################################################################################
-add_library(mantis SHARED ${SOURCE_FILES}) # link threads here?
+
+# main library
+add_library(mantis SHARED ${SOURCE_FILES})
+
+# link libs
 target_link_libraries(mantis PUBLIC Threads::Threads nlohmann_json::nlohmann_json Boost::program_options ${MANTIS_DRIVER_LIBS})
 
 # include dirs
@@ -99,6 +107,7 @@ target_include_directories(mantis PUBLIC
         $<INSTALL_INTERFACE:include>
 )
 
+# version
 set_target_properties(mantis PROPERTIES VERSION ${PROJECT_VERSION})
 
 #####################################################################################
