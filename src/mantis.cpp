@@ -68,6 +68,12 @@ int main(int argc, char** argv) {
          "master clock rate; can also be passed in args as master_clock_rate. This argument takes precedence");
 
     po::variables_map vm;
+    try {
+        po::store(po::parse_command_line(argc, argv, desc), vm);
+    } catch (const po::error &e) {
+        std::cerr << "Error parsing command line: " << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
     po::store(po::parse_command_line(argc, argv, desc), vm);
 
     if (vm.count("help")) {
