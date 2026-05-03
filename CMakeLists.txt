@@ -5,7 +5,7 @@ Project(mantis VERSION 0.0.3)
 
 # generate version config an supported drivers list
 configure_file(cmake_templates/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/version.h)
-# TODO: move this down and add the drivers list to .in file
+
 # CXX standard
 set(CMAKE_CXX_STANDARD 20)
 
@@ -50,6 +50,7 @@ list(APPEND SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/config.cpp)
 #####################################################################################
 ##                                  relevant drivers                               ##
 #####################################################################################
+
 # uhd
 find_package(UHD)
 if (UHD_FOUND)
