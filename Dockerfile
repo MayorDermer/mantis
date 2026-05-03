@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
     ca-certificates \
+    libuhd-dev \
     nlohmann-json3-dev \
     libboost-program-options-dev && rm -rf /var/lib/apt/lists/* 
 
@@ -18,7 +19,7 @@ ADD . "mantis"
 RUN if [ -d "mantis/build" ]; then rm -rf mantis/build; fi
 
 RUN cd mantis && mkdir -p build \
-&& cd build && cmake .. && make install \
+&& cd build && cmake .. && make -j $(nproc) install \
 && cd ../.. && rm -rf mantis
 
 RUN ldconfig
