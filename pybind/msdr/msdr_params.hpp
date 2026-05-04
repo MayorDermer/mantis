@@ -2,7 +2,6 @@
 #include <pybind11/pybind11.h>
 
 void bind_msdr_params(py::module_& m) {
-    // 1. Start the class definition
     py::class_<mantis::params::msdr_params> cl(
         m, "msdr_params", "struct that contains all the parameters needed to find, init, and configure an SDR.");
 
@@ -10,8 +9,6 @@ void bind_msdr_params(py::module_& m) {
         .def("get_find_args", &mantis::params::msdr_params::get_find_args)
         .def("get_config_args", &mantis::params::msdr_params::get_config_args);
 
-// 2. Use the X-Macro to bind all fields automatically
-// We define PARAM to call .def_readwrite on our class 'cl'
 #define PARAM(name, default_val) cl.def_readwrite(#name, &mantis::params::msdr_params::name);
 
     MSDR_SEARCH_PARAMS
