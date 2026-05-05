@@ -290,6 +290,16 @@ std::vector<mantis::params::msdr_params> mantis::device_manager::find(params::ms
     return found_devices;
 }
 
+std::vector<mantis::params::msdr_params> mantis::device_manager::get_connected() {
+    std::vector<params::msdr_params> connected_devices{};
+    connected_devices.reserve(this->connected_sdrs.size());
+    
+    for (const auto &msdr: this->connected_sdrs) {
+        connected_devices.emplace_back(msdr->get_params());
+    }
+    return connected_devices;
+}
+
 void mantis::device_manager::configure() {
     const char *config_file = std::getenv("MANTIS_CONFIG_FILE");
     config_file = (config_file == nullptr) ? MANTIS_DEFAULT_CONFIG_FILE_PATH : config_file;

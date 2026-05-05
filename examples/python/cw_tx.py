@@ -2,12 +2,15 @@ import mantis
 from mantis import errors as me
 from mantis import utils as mu
 import argparse
+import numpy as np
 
-threshold = 1e-6
+THRESHOLD = 1e-6
+
+TX_BUFF_SIZE = 16e5
 
 
 def passes_threshold(val_1, val_2):
-    return abs(val_1 - val_2) < threshold
+    return abs(val_1 - val_2) < THRESHOLD
 
 
 def main():
@@ -65,14 +68,14 @@ def main():
         mu.perror("Could not init relevant SDR: " + me.mantis_errno(err))
         return
 
-    # aquire channel
+    # acquire channel
     err, tx_channel = d_manager.get_tx_channel(params, channel_num)
     if err != me.error_code.SUCCESS:
         mu.perror("Failed to acquire TX channel: " + me.mantis_errno(err))
         return
 
     # configure channel
-    ac_freq = tx_channel.set_frequency(freq, lo)
+    ac_freq = tx_channel.set_freq(freq, lo)
     if not passes_threshold(ac_freq, freq):
         mu.pwarn(
             "Couldn't set freq to: "
@@ -91,7 +94,7 @@ def main():
             + str(ac_gain)
             + " dB"
         )
-    ac_rate = tx_channel.set_sample_rate(rate)
+    ac_rate = tx_channel.set_rate(rate)
     if not passes_threshold(ac_rate, rate):
         mu.pwarn(
             "Couldn't set rate to: "
@@ -101,7 +104,24 @@ def main():
             + " Sps"
         )
 
-    
+    sample_size = mu.get_sample_size()
+
+    num_samples = int(TX_BUFF_SIZE // sample_size)
+
+    cw = np.ones(num_samples, dtype=np.complex64)
+
+    tx_md = mantis.mtx_metadata()
+    tx_md.start_of_burst = True
+    tx_md.end_of_burst = False
+
+    mu.pinfo("Starting CW Tx, will continue until stopped")
+    while True:
+        if not tx_channel.is_valid():
+            mu.perror(
+                "SDR healthcheck failed, channel is no longer valid. shutting down..."
+            )
+            break
+        tx_channel.send(cw, tx_md)
 
 
 if __name__ == "__main__":

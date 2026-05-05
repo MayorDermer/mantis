@@ -28,10 +28,13 @@ void bind_device_manager(py::module_& m) {
         .def("find", &mantis::device_manager::find, py::arg("params"),
              "Returns a list of devices found on the machine.")
 
+        .def("get_connected", &mantis::device_manager::get_connected,
+             "Returns a list of params of devices currently being managed by mantis.")
+
         // 5. String Representation
         .def("__repr__", [](const mantis::device_manager& dm) {
             std::stringstream ss;
-            ss << dm; 
+            ss << dm;
             return ss.str();
         });
 }

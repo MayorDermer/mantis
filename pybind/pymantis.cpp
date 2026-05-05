@@ -9,6 +9,7 @@
 #include "classes/mtx_metadata.hpp"
 #include "classes/mrx_metadata.hpp"
 #include "utilities/prints.hpp"
+#include "utilities/general.hpp"
 
 namespace py = pybind11;
 
@@ -28,4 +29,5 @@ PYBIND11_MODULE(mantis, m) {
 // namespaces
     py::module_ utils = m.def_submodule("utils", "mantis utility functions");
     bind_prints(utils);
+    bind_general(utils);
 }
