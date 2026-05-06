@@ -1,7 +1,3 @@
-    //
-// Created by Jon Kler on 6/10/25.
-//
-
 #include <mantis/mantis.h>
 #include <fstream>
 #include <boost/program_options.hpp>
