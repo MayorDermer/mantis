@@ -8,7 +8,6 @@ RX_BUFF_SIZE = 1e5
 THRESHOLD = 1e-6
 
 
-
 def passes_threshold(val_1, val_2):
     return abs(val_1 - val_2) < THRESHOLD
 
@@ -45,7 +44,8 @@ def main():
         "--master_clock_rate",
         type=str,
         default=None,
-        help="master clock rate; can also be passed in args as master_clock_rate. This argument takes precedence",
+        help="master clock rate; can also be passed in args as master_clock_rate. "
+             "This argument takes precedence",
     )
 
     args = parser.parse_args()
@@ -59,9 +59,7 @@ def main():
     err, params = mantis.msdr_params.from_str(args.args)
     if err != me.error_code.SUCCESS:
         mu.perror(
-            "Failed to parse msdr_params from args string: {} -- {}".format(
-                args.args, me.mantis_errno(err)
-            )
+            f"Failed to parse msdr_params from args string: {args.args} -- {me.mantis_errno(err)}"
         )
         return
 
@@ -130,11 +128,14 @@ def main():
     with open(args.filename, "wb") as f:
         while True:
             if not rx_channel.is_valid():
-                mu.perror("SDR healthcheck failed, channel is no longer valid. shutting down...")
+                mu.perror(
+                    "SDR healthcheck failed, channel is no longer valid. shutting down..."
+                )
                 break
 
             rx_channel.receive(buff, rx_md)
             f.write(mv_buff)
+
 
 if __name__ == "__main__":
     main()

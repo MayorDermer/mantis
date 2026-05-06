@@ -29,7 +29,9 @@ def main():
         help="absolute path of the file to transmit",
     )
 
-    parser.add_argument("-n", "--reps", type=float, default=1, help="number of file tx repetitions")
+    parser.add_argument(
+        "-n", "--reps", type=float, default=1, help="number of file tx repetitions"
+    )
     parser.add_argument("-R", "--repeat", action="store_true", help="frequency in [Hz]")
 
     parser.add_argument("--freq", type=float, default=100e6, help="frequency in [Hz]")
@@ -47,7 +49,8 @@ def main():
         "--master_clock_rate",
         type=str,
         default=None,
-        help="master clock rate; can also be passed in args as master_clock_rate. This argument takes precedence",
+        help="master clock rate; can also be passed in args as master_clock_rate. "
+             "This argument takes precedence",
     )
 
     args = parser.parse_args()
@@ -61,9 +64,7 @@ def main():
     err, params = mantis.msdr_params.from_str(args.args)
     if err != me.error_code.SUCCESS:
         mu.perror(
-            "Failed to parse msdr_params from args string: {} -- {}".format(
-                args.args, me.mantis_errno(err)
-            )
+            f"Failed to parse msdr_params from args string: {args.args} -- {me.mantis_errno(err)}"
         )
         return
 
@@ -125,7 +126,7 @@ def main():
     num_samples = int(TX_BUFF_SIZE // sample_size)
 
     buff = np.zeros(num_samples, dtype=np.complex64)
-    mv_buff = memoryview(buff).cast('B')
+    mv_buff = memoryview(buff).cast("B")
 
     tx_md = mantis.mtx_metadata()
     tx_md.start_of_burst = True
@@ -135,7 +136,9 @@ def main():
     with open(args.filename, "rb") as f:
         while repeat or reps:
             if not tx_channel.is_valid():
-                mu.perror("SDR healthcheck failed, channel is no longer valid. shutting down...")
+                mu.perror(
+                    "SDR healthcheck failed, channel is no longer valid. shutting down..."
+                )
                 break
 
             bytes_read = f.readinto(mv_buff)
@@ -146,6 +149,7 @@ def main():
 
             if not repeat:
                 reps -= 1
+
 
 if __name__ == "__main__":
     main()
