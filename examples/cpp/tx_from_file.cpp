@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
             ("args", po::value<std::string>(), "device args str")
             ("freq", po::value<double>()->default_value(100e6, "100e6"), "Tx freq [Hz], will default to 100MHz")
             ("lo", po::value<double>(), "lo offset freq [Hz] By default will allow SDR lib to choose most fitting lo")
-            ("rate", po::value<double>()->default_value(10e6, "10e6"), "Tx rate [Hz], will default to 10 MHz")
+            ("rate", po::value<double>()->default_value(10e6, "10e6"), "Tx rate [Sps], will default to 10 MSps")
             ("gain", po::value<double>()->default_value(0.0), "Tx gain")
             ("master_clock_rate,mcr", po::value<double>(),
              "master clock rate; can also be passed in args as master_clock_rate. This argument takes precedence")

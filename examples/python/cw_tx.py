@@ -5,7 +5,6 @@ import argparse
 import numpy as np
 
 THRESHOLD = 1e-6
-
 TX_BUFF_SIZE = 16e5
 
 

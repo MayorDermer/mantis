@@ -3,9 +3,8 @@ from mantis import errors as me
 from mantis import utils as mu
 import argparse
 import numpy as np
-import time
-THRESHOLD = 1e-6
 
+THRESHOLD = 1e-6
 TX_BUFF_SIZE = 16e5
 
 
@@ -14,7 +13,7 @@ def passes_threshold(val_1, val_2):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Transmit continuous cw")
+    parser = argparse.ArgumentParser(description="Tx from file")
     parser.add_argument(
         "-a",
         "--args",
