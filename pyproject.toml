@@ -11,3 +11,9 @@ description = "Mantis Python bindings"
 requires-python = ">=3.12"
 readme = "README.md"
 license = {text = "MIT"}
+
+[tool.scikit-build]
+wheel.packages = ["stubs/mantis"]
+
+[tool.pyright]
+include = ["stubs/mantis"]
