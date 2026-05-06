@@ -36,7 +36,8 @@ def main():
         "--master_clock_rate",
         type=str,
         default=None,
-        help="master clock rate; can also be passed in args as master_clock_rate. This argument takes precedence",
+        help="master clock rate; can also be passed in args as master_clock_rate. "
+             "This argument takes precedence",
     )
 
     args = parser.parse_args()
@@ -46,9 +47,7 @@ def main():
     err, params = mantis.msdr_params.from_str(args.args)
     if err != me.error_code.SUCCESS:
         mu.perror(
-            "Failed to parse msdr_params from args string: {} -- {}".format(
-                args.args, me.mantis_errno(err)
-            )
+            f"Failed to parse msdr_params from args string: {args.args} -- {me.mantis_errno(err)}"
         )
         return
 
