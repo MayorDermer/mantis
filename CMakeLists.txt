@@ -1,9 +1,5 @@
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
-if(POLICY CMP0167)
-  # Use FindBoost.cmake to find Boost libs on newer cmake versions
-  cmake_policy(SET CMP0167 NEW)
-endif()
 
 # declare project
 project(mantis VERSION 0.1.0)
@@ -14,6 +10,7 @@ set(CMAKE_CXX_STANDARD 20)
 # generate version config an supported drivers list
 configure_file(cmake_templates/version.h.in
               ${CMAKE_CURRENT_BINARY_DIR}/include/mantis/version.h)
+
 
 #####################################################################################
 ##                                 Compiler Flags                                  ##
@@ -43,6 +40,12 @@ endif()
 #####################################################################################
 ##                                 Dependencies                                    ##
 #####################################################################################
+
+if(POLICY CMP0167)
+  # Use FindBoost.cmake to find Boost libs on newer cmake versions
+  cmake_policy(SET CMP0167 NEW)
+endif()
+
 find_package(Threads REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(Boost REQUIRED COMPONENTS program_options)
