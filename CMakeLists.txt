@@ -51,6 +51,7 @@ find_package(nlohmann_json REQUIRED)
 find_package(Boost REQUIRED COMPONENTS program_options)
 
 if(PYTHON OR DEFINED SKBUILD) # python on request or pip install
+  message(STATUS "Compiling with pyhton support")
   find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
   set(PYBIND11_FINDPYTHON ON)
   find_package(pybind11 CONFIG REQUIRED)

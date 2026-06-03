@@ -18,7 +18,6 @@ fi
 echo "Installing mantis..."
 git clone https://github.com/dermayor/mantis.git
 cd mantis
-git checkout cmake_refactor
 
 $SUDO chmod +x ./scripts/install_deps.sh
 $SUDO ./scripts/install_deps.sh
