@@ -2,7 +2,7 @@
 
 #include <chrono>
 #include <mantis/config.h>
-#include <mantis/lib/utilities/time_utils.h>
+#include <mantis/detail/utilities/time_utils.h>
 
 /**
  * The amount of nanoseconds in a single second

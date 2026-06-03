@@ -2,6 +2,9 @@
 #include <fstream>
 #include <iostream>
 #include <mantis/mantis.h>
+#include <mantis/detail/device_manager/device_manager.h>
+#include <mantis/detail/utilities/exceptions.h>
+#include <mantis/detail/utilities/prints.h>
 
 static constexpr double BUFF_SIZE = 1e5;
 static constexpr double threshold = 1e-6;

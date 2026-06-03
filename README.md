@@ -31,7 +31,7 @@ curl -fsSL https://raw.githubusercontent.com/dermayor/mantis/refs/heads/main/scr
         - append the driver library to the variable MANTIS_DRIVER_LIBS var
         - append the src/driver_impl/<new_driver>/*.cpp files to the SOURCE_FILES var
         - add an install() function in the cmake that installs the include/driver_impl/<new_driver> directory to
-          include/mantis/driver_impl/
+          include/mantis/detail/driver_impl/
 
 2. Create 2 new directories:
     - include/driver_impl/<new_driver>/ and src/dirver_impl/<new_driver> where you will store your .h and .cpp files

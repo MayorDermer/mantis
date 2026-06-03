@@ -1,22 +1,16 @@
-//
-// Created by Jon Kler on 4/7/25.
-//
-
 #include "mantis/lib/classes/msdr/msdr.h"
-#include "mantis/driver_impl/virtual/utilities/virtual_utils.h"
-#include <mantis/lib/errors/exceptions.h>
+#include "mantis/detail/driver_impl/virtual/utilities/virtual_utils.h"
 
 #ifdef M_UHD
 
 #include <utility>
 
-#include "mantis/driver_impl/uhd/utilities/uhd_utils.h"
+#include "mantis/detail/driver_impl/uhd/utilities/uhd_utils.h"
 
 #endif
 
 
-#include <iostream>
-#include <mantis/lib/utilities/prints.h>
+#include <mantis/detail/utilities/prints.h>
 
 static int sdr_init_num = 0;
 

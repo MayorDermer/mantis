@@ -67,6 +67,11 @@ set(MANTIS_SUPPORTED_DRIVERS "UHD")
 file(GLOB_RECURSE SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/*.cpp)
 list(APPEND SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/config.cpp)
 
+# get detail files (barring driver specific)
+file(GLOB_RECURSE NO_DRIVER_DETAIL_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/detail/*.cpp)
+list(FILTER NO_DRIVER_DETAIL_FILES EXCLUDE REGEX ".*/driver_impl/.*")
+list(APPEND SOURCE_FILES ${NO_DRIVER_DETAIL_FILES})
+
 #####################################################################################
 ##                                  relevant drivers                               ##
 #####################################################################################
@@ -78,24 +83,24 @@ if(UHD_FOUND)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-DM_UHD=TRUE>) # ifdef uhd flag
   list(APPEND MANTIS_DRIVER_LIBS uhd) # update libs var
 
-  file(GLOB_RECURSE MANTIS_UHD_SOURCE_FILES src/driver_impl/uhd/*.cpp) # add include uhd source files
+  file(GLOB_RECURSE MANTIS_UHD_SOURCE_FILES src/detail/driver_impl/uhd/*.cpp) # add include uhd source files
   list(APPEND SOURCE_FILES ${MANTIS_UHD_SOURCE_FILES})
   if(NOT DEFINED SKBUILD)
-    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/driver_impl/uhd
-            DESTINATION include/mantis/driver_impl/) # install mantis uhd impl includes
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/detial/driver_impl/uhd
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mantis/detail/driver_impl) # install mantis uhd impl includes
   endif()
 else()
   message("Compiling without UHD support")
 endif()
 
 # add the "virtual" driver
-file(GLOB_RECURSE MANTIS_VIRTUAL_SOURCE_FILES src/driver_impl/virtual/*.cpp) # add include virtual source files
+file(GLOB_RECURSE MANTIS_VIRTUAL_SOURCE_FILES src/detail/driver_impl/virtual/*.cpp) # add include virtual source files
 list(APPEND SOURCE_FILES ${MANTIS_VIRTUAL_SOURCE_FILES})
 
 # install virtual msdr includes
 if(NOT DEFINED SKBUILD)
-  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/driver_impl/virtual
-          DESTINATION include/mantis/driver_impl/) # install mantis virtual impl includes
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/detail/driver_impl/virtual
+          DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mantis/detail/driver_impl/) # install mantis virtual impl includes
 endif()
 
 # make sure we found at least one driver library
@@ -129,6 +134,8 @@ target_link_libraries(mantis PUBLIC Threads::Threads
 target_include_directories(mantis PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/detail>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/detail>
         $<INSTALL_INTERFACE:include>
 )
 
@@ -171,15 +178,21 @@ endif()
 #####################################################################################
 
 # additional mantis files
-file(GLOB OTHER_MANTIS_INCLUDES
-          ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/*.h
-          ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/*.hpp)
+set(OTHER_MANTIS_INCLUDES "")
+list(APPEND OTHER_MANTIS_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/mantis.h
+          ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/config.h)
 
 include(GNUInstallDirs)
 
 #install include dir
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/lib
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mantis)
+
+#install detail
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/mantis/detail/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mantis/detail
+    PATTERN "detail" EXCLUDE
+)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/include/mantis/version.h
               ${CMAKE_CURRENT_BINARY_DIR}/include/mantis/build_info.h

@@ -1,31 +1,24 @@
-//
-// Created by Jon Kler on 4/20/25.
-//
-
 #pragma once
 
 #include <mantis/config.h>
 #include <mantis/lib/classes/mchannel/mchannel_params.h>
-#include <mantis/lib/classes/time_tag.h>
 #include <mantis/lib/classes/msdr/msdr_params.h>
+#include <mantis/lib/classes/time_tag.h>
 #include <mantis/lib/errors/error_codes.h>
 #include <memory>
 #include <optional>
 #include <utility>
 
-
 namespace mantis::interfaces {
     /**
      * @brief basic channel interface. Uses CRTP to determine if rx/tx channel to add respective functionality
      */
-    template<typename ChannelT>
-    class MANTIS_API i_channel : public ChannelT {
-    public:
+    template <typename ChannelT> class MANTIS_API i_channel : public ChannelT {
+      public:
         using sptr = std::shared_ptr<i_channel<ChannelT>>;
 
-        explicit i_channel(params::msdr_params _params, params::mchannel_params _channel_params) : params(std::move(_params)),
-                                                                                                   channel_params(
-                                                                                                           _channel_params) {}
+        explicit i_channel(params::msdr_params _params, params::mchannel_params _channel_params)
+            : params(std::move(_params)), channel_params(_channel_params) {}
 
         virtual ~i_channel() = default;
 
@@ -35,7 +28,8 @@ namespace mantis::interfaces {
         [[nodiscard]] virtual bool healthcheck() = 0;
 
         /**
-         * @brief Syncs SDR to given timestamp. If relevant (passed in msdr_params), will wait for given timeout to check if sdr has a time source, and a clock source.
+         * @brief Syncs SDR to given timestamp. If relevant (passed in msdr_params), will wait for given timeout to
+         * check if sdr has a time source, and a clock source.
          * @param unix_timestamp_micro timestamp to sync sdr time to in micro seconds from unix time
          * @return SUCCESS if succeeded, INVALID_TIME_SOURCE if time source of sdr and params do not match
          */
@@ -52,7 +46,8 @@ namespace mantis::interfaces {
         [[nodiscard]] size_t get_channel_num() const { return this->channel_params.channel_num; }
 
         /**
-         * @brief returns whether or not the sdr is valid (invalidation occurs when an sdr disconnects/ for user defined reasons)
+         * @brief returns whether or not the sdr is valid (invalidation occurs when an sdr disconnects/ for user defined
+         * reasons)
          */
         [[nodiscard]] bool is_valid() const { return this->channel_params.is_valid; }
 
@@ -64,9 +59,7 @@ namespace mantis::interfaces {
         /**
          * @brief invalidates channel. Doesn't actually do anything if you don't check is_valid() before use
          */
-        void invalidate() {
-            this->channel_params.is_valid = false;
-        }
+        void invalidate() { this->channel_params.is_valid = false; }
 
         /**
          * @brief sets channel rate
@@ -108,7 +101,6 @@ namespace mantis::interfaces {
          */
         [[nodiscard]] virtual double get_gain() = 0;
 
-
         /**
          * @brief returns list of valid sample rates for channel
          */
@@ -126,13 +118,13 @@ namespace mantis::interfaces {
          */
         virtual void set_time_source(const std::string& time_source) = 0;
 
-         /**
-          * @brief attempts to set power ref and returns actual power_ref and an error code indicating whether or not number is valid. it is recommended to use the can_set_power_ref()
-          * function before attempting
-          * @return {power_ref, SUCCESS} on success
-          * {0, POWER_REF_UNAVAILABLE} if cannot set power ref
-          * @param power_dbm desired power in dbm
-          */
+        /**
+         * @brief attempts to set power ref and returns actual power_ref and an error code indicating whether or not
+         * number is valid. it is recommended to use the can_set_power_ref() function before attempting
+         * @return {power_ref, SUCCESS} on success
+         * {0, POWER_REF_UNAVAILABLE} if cannot set power ref
+         * @param power_dbm desired power in dbm
+         */
         virtual std::pair<double, errors::error_code> set_power_ref(double power_dbm) = 0;
 
         /**
@@ -147,9 +139,8 @@ namespace mantis::interfaces {
          */
         [[nodiscard]] virtual bool can_set_power_ref() = 0;
 
-
-    private:
+      private:
         params::msdr_params params;
         params::mchannel_params channel_params;
     };
-}
+} // namespace mantis::interfaces
