@@ -1,7 +1,3 @@
-//
-// Created by Jon Kler on 6/5/25.
-//
-
 #pragma once
 
 #include <mantis/config.h>
@@ -19,4 +15,4 @@ namespace mantis::utils {
 
     //! print mantis version info
     void MANTIS_API pversion();
-}
+} // namespace mantis::utils

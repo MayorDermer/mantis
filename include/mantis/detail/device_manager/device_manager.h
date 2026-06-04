@@ -1,11 +1,11 @@
 #pragma once
 
 #include <mantis/config.h>
+#include <mantis/detail/utilities/exceptions.h>
+#include <mantis/detail/utilities/spin_lock.h>
 #include <mantis/lib/classes/msdr/msdr.h>
 #include <mantis/lib/classes/msdr/msdr_params.h>
 #include <mantis/lib/errors/error_codes.h>
-#include <mantis/detail/utilities/exceptions.h>
-#include <mantis/detail/utilities/spin_lock.h>
 #include <thread>
 #include <vector>
 
@@ -20,7 +20,7 @@ namespace mantis {
      * after failing the healthcheck. All users should validate their channels
      * before using them.
      */
-    class MANTIS_API device_manager {
+    class device_manager {
       public:
         /**
          * @brief get an instance of the device_manager.
@@ -110,14 +110,15 @@ namespace mantis {
         std::vector<params::msdr_params> get_connected();
 
         device_manager(device_manager& other) = delete;
-
         device_manager(device_manager&& other) = delete;
+
+        device_manager& operator=(const device_manager& other) = delete;
+        device_manager& operator=(device_manager&& other) = delete;
 
       private:
         friend MANTIS_API std::ostream& operator<<(std::ostream& stream, const device_manager& d_manager);
 
         device_manager();
-
         ~device_manager();
 
         /**

@@ -98,8 +98,9 @@ mantis::errors::error_code mantis::device_manager::init_internal(int num, std::v
 #ifdef M_UHD
     if (!config::FORCE_VIRTUAL) {
         auto err = driver_impl::uhd_i::uhd_device_finder::init(uhd_sdrs, o_found_sdrs, msdr_params);
-        if (!errors::succeeded(err) && !config::ALLOW_VIRTUAL)
+        if (!errors::succeeded(err) && !config::ALLOW_VIRTUAL) {
             return err;
+        }
     }
 #endif
 

@@ -1,10 +1,10 @@
 #include <boost/program_options.hpp>
 #include <fstream>
 #include <iostream>
-#include <mantis/mantis.h>
 #include <mantis/detail/device_manager/device_manager.h>
 #include <mantis/detail/utilities/exceptions.h>
 #include <mantis/detail/utilities/prints.h>
+#include <mantis/mantis.h>
 
 static constexpr double BUFF_SIZE = 1e5;
 static constexpr double threshold = 1e-6;
@@ -51,8 +51,9 @@ int main(int argc, char** argv) {
     opts("tx_from_file,t", po::bool_switch(&tx_from_file)->default_value(false), "transmit from file");
     opts("rx_to_file,r", po::bool_switch(&rx_to_file)->default_value(false), "receive to file");
     opts("cw,w", po::bool_switch(&cw)->default_value(false), "transmit a continuous wave");
-    opts("drivers_list,d", po::bool_switch(&drivers_list)->default_value(false), "list available drivers with current build");
-    
+    opts("drivers_list,d", po::bool_switch(&drivers_list)->default_value(false),
+         "list available drivers with current build");
+
     // args
     opts("args,a", po::value<std::string>(&args)->default_value(""), "device args str. Leave empty to find all");
     opts("filename,F", po::value<std::string>(&filename)->default_value(""),
@@ -73,7 +74,7 @@ int main(int argc, char** argv) {
     po::variables_map vm;
     try {
         po::store(po::parse_command_line(argc, argv, desc), vm);
-    } catch (const po::error &e) {
+    } catch (const po::error& e) {
         std::cerr << "Error parsing command line: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
@@ -96,8 +97,6 @@ int main(int argc, char** argv) {
         return EXIT_SUCCESS;
     }
 
-    auto& d_manager = mantis::device_manager::get_instance();
-
     mantis::params::msdr_params params{};
     if (!args.empty()) {
         if (!mantis::errors::succeeded(mantis::params::msdr_params::from_str(args, params))) {
@@ -105,7 +104,7 @@ int main(int argc, char** argv) {
         }
     }
 
-    auto found_devices = d_manager.find(params);
+    auto found_devices = mantis::find(params);
 
     if (find) {
         if (found_devices.empty()) {
@@ -158,7 +157,7 @@ int main(int argc, char** argv) {
     }
 
     // init sdr TODO: get rid of the init and init in get_x_channel?
-    if (!mantis::errors::succeeded(d_manager.init(1, params))) {
+    if (!mantis::errors::succeeded(mantis::init(1, params))) {
         mantis::utils::perror("Could not init relevant SDR");
         return EXIT_FAILURE;
     }
@@ -167,7 +166,7 @@ int main(int argc, char** argv) {
     if (tx_from_file || cw) {
 
         /// acquire channel
-        auto [err, tx_channel] = d_manager.get_tx_channel(params, channel_num);
+        auto [err, tx_channel] = mantis::get_tx_channel(params, channel_num);
         if (!mantis::errors::succeeded(err)) {
             mantis::utils::perror("Failed to Acquire Channel: " + mantis::errors::mantis_errno(err));
             return EXIT_FAILURE;
@@ -261,7 +260,7 @@ int main(int argc, char** argv) {
         }
 
         /// acquire channel
-        auto [err, rx_channel] = d_manager.get_rx_channel(params, channel_num);
+        auto [err, rx_channel] = mantis::get_rx_channel(params, channel_num);
         if (!mantis::errors::succeeded(err)) {
             mantis::utils::perror("Failed to Acquire Rx Channel: " + mantis::errors::mantis_errno(err));
             return EXIT_FAILURE;
@@ -299,7 +298,7 @@ int main(int argc, char** argv) {
             }
 
             rx_channel->receive(buff, sample_size, BUFF_SIZE / sample_size, rx_md);
-            rx_md.has_time_spec = false;  // otherwise we rx in the past
+            rx_md.has_time_spec = false; // otherwise we rx in the past
             file.write(buff, BUFF_SIZE);
         }
     }
