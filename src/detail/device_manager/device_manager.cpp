@@ -263,21 +263,3 @@ void mantis::device_manager::configure() {
     }
 }
 
-namespace mantis {
-    std::ostream& operator<<(std::ostream& stream, const mantis::device_manager& d_manager) {
-        if (d_manager.connected_sdrs.empty()) {
-            stream << "No devices connected\n";
-            return stream;
-        }
-
-        int i = 0;
-        for (const auto& msdr : d_manager.connected_sdrs) {
-            stream << "=================================\n";
-            stream << "Mantis Device " << std::to_string(i++) << "\n";
-            stream << "=================================\n";
-            stream << msdr->get_params() << std::endl;
-            stream << "\n\n";
-        }
-        return stream;
-    }
-} // namespace mantis

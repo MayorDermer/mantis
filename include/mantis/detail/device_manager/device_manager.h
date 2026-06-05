@@ -116,7 +116,6 @@ namespace mantis {
         device_manager& operator=(device_manager&& other) = delete;
 
       private:
-        friend MANTIS_API std::ostream& operator<<(std::ostream& stream, const device_manager& d_manager);
 
         device_manager();
         ~device_manager();
